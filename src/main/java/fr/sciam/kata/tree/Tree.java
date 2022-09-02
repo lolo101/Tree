@@ -1,10 +1,6 @@
 package fr.sciam.kata.tree;
 
-import static java.util.stream.Collectors.joining;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Tree {
 
@@ -25,24 +21,15 @@ public class Tree {
     public record Node(String value, Node ... children) {
 
         public String toText() {
-            List<Node> nodes = stackChildren(List.of(this), 0);
-            return nodes.stream()
-                .map(Node::getValue)
-                .collect(joining(" "));
-        }
-
-        private static List<Node> stackChildren(List<Node> nodes, int currentNodeIndex) {
-            if (currentNodeIndex < nodes.size()) {
-                Node currentNode = nodes.get(currentNodeIndex);
-                return stackChildren(concat(nodes, currentNode.getChildren()), currentNodeIndex + 1);
+            List<String> values = new LinkedList<>();
+            Queue<Node> nodes = new LinkedList<>();
+            nodes.add(this);
+            while (!nodes.isEmpty()) {
+                Node currentNode = nodes.remove();
+                nodes.addAll(currentNode.getChildren());
+                values.add(currentNode.getValue());
             }
-            return nodes;
-        }
-
-        private static List<Node> concat(List<Node> nodes, List<Node> children) {
-            List<Node> newNodes = new ArrayList<>(nodes);
-            newNodes.addAll(children);
-            return newNodes;
+            return String.join(" ", values);
         }
 
         public List<Node> getChildren() {
